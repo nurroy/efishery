@@ -2,7 +2,7 @@ package router
 
 import (
 	"belajar/efishery/configs"
-	"belajar/efishery/controller"
+	"belajar/efishery/controller/user"
 	"belajar/efishery/models"
 	"belajar/efishery/repo"
 	"belajar/efishery/usecase"
@@ -23,7 +23,7 @@ func Router(config *configs.Config) *gin.Engine{
 
 	{
 		newRoute := v1.Group("efishery")
-		controller.CreateUserController(newRoute, userService)
+		user.CreateUserController(newRoute, userService)
 	}
 	return router
 
