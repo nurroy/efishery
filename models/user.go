@@ -30,4 +30,5 @@ type ValidateResponse struct {
 	UserID    string `json:"userid"`
 	Username  string `json:"username"`
 	Role      string `json:"role"`
+	Exp 	  int64  `json:"exp"`
 }

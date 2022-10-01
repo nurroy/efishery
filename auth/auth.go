@@ -3,7 +3,8 @@ package auth
 import (
 	"belajar/efishery/configs"
 	"belajar/efishery/models"
-	"fmt"
+	utils "belajar/efishery/utils/response"
+	"errors"
 	"github.com/dgrijalva/jwt-go"
 
 	"net/http"
@@ -34,6 +35,14 @@ func TokenValid(r *http.Request, auth string,config *configs.Config) (jwt.MapCla
 		return nil, err
 	}
 
+	if r != nil {
+		if strings.Contains(r.URL.Path, "aggregate") {
+			if claims["role"] != "admin" {
+				return nil, utils.NewErr("You need to be an admin to perform this api call")
+			}
+		}
+	}
+
 	return claims,nil
 }
 
@@ -47,15 +56,17 @@ func VerifyToken(r *http.Request,auth string,config *configs.Config) (*jwt.Token
 	}
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		//does this token conform to "SigningMethodHMAC" ?
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		if method, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil,errors.New("Signing method invalid")
+		} else if method != jwt.SigningMethodHS256 {
+			return nil,errors.New("Signing method invalid")
 		}
 		return []byte(config.Secret.Key), nil
 	})
 	if err != nil {
 		return nil, err
 	}
+
 	return token, nil
 }
 

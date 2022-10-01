@@ -24,19 +24,19 @@ func CreateUserServiceImpl(userRepo repo.UserRepoInterface,config *configs.Confi
 	return &UserService{userRepo,config}
 }
 
-//RegisterUser
+//RegisterUser is register usecase
 func (r *UserService) RegisterUser(data *models.User)(*models.User,error){
 
 	data,err := r.userRepo.RegisterUser(data)
 	if err != nil{
-		log.Printf("[Usecase.User.Register][1] error when register user with error : %v",err)
+		log.Printf("[Usecase][USER][REGISTER][1001] error when register user with error : %v",err)
 		return nil, err
 	}
 
 	return data,nil
 }
 
-//CreateAuth
+//CreateAuth is create auth usecase
 func (r *UserService) CreateAuth(data *models.User)(*models.LoginResponse, error){
 	var res models.LoginResponse
 	var tokenResult string
@@ -44,7 +44,7 @@ func (r *UserService) CreateAuth(data *models.User)(*models.LoginResponse, error
 
 	user , err := r.userRepo.GetUserById(data.UserID)
 	if err != nil{
-		log.Printf("[Usecase.User.Auth][1] error when get user by id with error : %v",err)
+		log.Printf("[Usecase][USER][AUTH][1001] error when get user by id with error : %v",err)
 		return nil, err
 	}
 
@@ -54,7 +54,7 @@ func (r *UserService) CreateAuth(data *models.User)(*models.LoginResponse, error
 
 	tokenResult, err = auth.CreateToken(authD,r.config)
 	if err != nil {
-		log.Printf("[Usecase.User.Auth][2] error when create token with error : %v",err)
+		log.Printf("[Usecase][USER][AUTH][1002] error when create token with error : %v",err)
 		return nil, err
 	}
 
@@ -63,18 +63,19 @@ func (r *UserService) CreateAuth(data *models.User)(*models.LoginResponse, error
 	return &res,nil
 }
 
-//ValidateToken
+//ValidateToken is validate usecase
 func (r *UserService) ValidateToken(data *models.User)(*models.ValidateResponse,error){
 	var res models.ValidateResponse
 	claims,err := auth.TokenValid(nil,data.Token,r.config)
 	if err != nil{
-		log.Printf("[Usecase.User.Validate][1] error when validate user with error : %v",err)
+		log.Printf("[Usecase][USER][VALIDATE][1001] error when validate user with error : %v",err)
 		return nil, err
 	}
 
 	res.UserID = claims["userid"].(string)
 	res.Username = claims["username"].(string)
 	res.Role = claims["role"].(string)
+	res.Exp  = int64(claims["exp"].(float64))
 
 	return &res,nil
 }
@@ -84,7 +85,7 @@ func (r *UserService) CheckData(userid string)(data *models.User,err error){
 
 	data , err = r.userRepo.GetUserById(userid)
 	if err != nil{
-		log.Printf("[Usecase.User.Check][1] error when get user by id with error : %v",err)
+		log.Printf("[Usecase][USER][CHECKDATA][1001] error when get user by id with error : %v",err)
 		return nil, err
 	}
 
