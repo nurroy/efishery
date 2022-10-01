@@ -15,7 +15,7 @@ import (
 
 
 
-func Router(config *configs.Config) *gin.Engine{
+func Router() *gin.Engine{
 	router := gin.New()
 
 	var cache ttlcache.SimpleCache = ttlcache.NewCache()
@@ -25,9 +25,9 @@ func Router(config *configs.Config) *gin.Engine{
 	models.InitTable(db)
 
 	userRepo := repo.CreateUserRepoImpl(db)
-	userService := usecase.CreateUserServiceImpl(userRepo,config)
+	userService := usecase.CreateUserServiceImpl(userRepo)
 
-	fetchService := usecase.CreateFetchServiceImpl(config,cache)
+	fetchService := usecase.CreateFetchServiceImpl(cache)
 
 
 	v1 := router.Group("api/v1")
@@ -35,7 +35,7 @@ func Router(config *configs.Config) *gin.Engine{
 	{
 		newRoute := v1.Group("efishery")
 		user.CreateUserController(newRoute, userService)
-		fetch.CreateFetchController(newRoute,fetchService,config)
+		fetch.CreateFetchController(newRoute,fetchService)
 	}
 	return router
 

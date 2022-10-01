@@ -1,18 +1,18 @@
 package auth
 
 import (
-	"belajar/efishery/configs"
 	"belajar/efishery/models"
 	utils "belajar/efishery/utils/response"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"os"
 
 	"net/http"
 	"strings"
 	"time"
 )
 
-func CreateToken(authD models.Auth,config *configs.Config) (string, error) {
+func CreateToken(authD models.Auth) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
 	claims["userid"] = authD.UserID
@@ -20,12 +20,12 @@ func CreateToken(authD models.Auth,config *configs.Config) (string, error) {
 	claims["role"] = authD.Role
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(config.Secret.Key))
+	return token.SignedString([]byte(os.Getenv("SECRET")))
 }
 
 // Token Validation
-func TokenValid(r *http.Request, auth string,config *configs.Config) (jwt.MapClaims,error) {
-	token, err := VerifyToken(r,auth,config)
+func TokenValid(r *http.Request, auth string) (jwt.MapClaims,error) {
+	token, err := VerifyToken(r,auth)
 	if err != nil {
 		return nil,err
 	}
@@ -47,7 +47,7 @@ func TokenValid(r *http.Request, auth string,config *configs.Config) (jwt.MapCla
 }
 
 // Verify Token
-func VerifyToken(r *http.Request,auth string,config *configs.Config) (*jwt.Token, error) {
+func VerifyToken(r *http.Request,auth string) (*jwt.Token, error) {
 	var tokenString string
 	if r != nil{
 		tokenString = ExtractToken(r)
@@ -61,7 +61,7 @@ func VerifyToken(r *http.Request,auth string,config *configs.Config) (*jwt.Token
 		} else if method != jwt.SigningMethodHS256 {
 			return nil,errors.New("Signing method invalid")
 		}
-		return []byte(config.Secret.Key), nil
+		return []byte(os.Getenv("SECRET")), nil
 	})
 	if err != nil {
 		return nil, err

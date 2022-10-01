@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"belajar/efishery/configs"
 	"belajar/efishery/models"
 	"belajar/efishery/service/efishery"
 	"belajar/efishery/service/exchangerate"
@@ -14,7 +13,6 @@ import (
 )
 
 type FetchService struct {
-	config *configs.Config
 	cache ttlcache.SimpleCache
 }
 
@@ -28,8 +26,8 @@ type FetchServiceInterface interface {
 	GetAggregate()(*models.ResponseAgregate,error)
 }
 
-func CreateFetchServiceImpl(config *configs.Config,cache ttlcache.SimpleCache) FetchServiceInterface {
-	return &FetchService{config,cache}
+func CreateFetchServiceImpl(cache ttlcache.SimpleCache) FetchServiceInterface {
+	return &FetchService{cache}
 }
 
 

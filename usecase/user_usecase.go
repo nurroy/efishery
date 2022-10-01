@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"belajar/efishery/auth"
-	"belajar/efishery/configs"
 	"belajar/efishery/models"
 	"belajar/efishery/repo"
 	"log"
@@ -10,7 +9,6 @@ import (
 
 type UserService struct {
 	userRepo repo.UserRepoInterface
-	config *configs.Config
 }
 
 type UserServiceInterface interface {
@@ -20,8 +18,8 @@ type UserServiceInterface interface {
 	CheckData(userid string) (*models.User,error)
 }
 
-func CreateUserServiceImpl(userRepo repo.UserRepoInterface,config *configs.Config) UserServiceInterface {
-	return &UserService{userRepo,config}
+func CreateUserServiceImpl(userRepo repo.UserRepoInterface) UserServiceInterface {
+	return &UserService{userRepo,}
 }
 
 //RegisterUser is register usecase
@@ -52,7 +50,7 @@ func (r *UserService) CreateAuth(data *models.User)(*models.LoginResponse, error
 	authD.Username = user.Username
 	authD.Role = user.Role
 
-	tokenResult, err = auth.CreateToken(authD,r.config)
+	tokenResult, err = auth.CreateToken(authD)
 	if err != nil {
 		log.Printf("[Usecase][USER][AUTH][1002] error when create token with error : %v",err)
 		return nil, err
@@ -66,7 +64,7 @@ func (r *UserService) CreateAuth(data *models.User)(*models.LoginResponse, error
 //ValidateToken is validate usecase
 func (r *UserService) ValidateToken(data *models.User)(*models.ValidateResponse,error){
 	var res models.ValidateResponse
-	claims,err := auth.TokenValid(nil,data.Token,r.config)
+	claims,err := auth.TokenValid(nil,data.Token)
 	if err != nil{
 		log.Printf("[Usecase][USER][VALIDATE][1001] error when validate user with error : %v",err)
 		return nil, err

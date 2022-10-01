@@ -6,18 +6,17 @@ import (
 	"fmt"
 	g "github.com/incubus8/go/pkg/gin"
 	"github.com/rs/zerolog/log"
+	"github.com/subosito/gotenv"
 )
 
+func init() {
+	gotenv.Load()
+}
 
 func StartServer(){
-	// create config and logger
-	config, err := configs.New()
-	if err != nil{
-
-	}
-	addr := fmt.Sprintf("%s:%v",config.Server.Host,config.Server.Port)
+	addr := fmt.Sprintf("%s:%v",configs.Config.ServiceHost,configs.Config.ServicePort)
 	conf := g.Config{
-		Handler:             router.Router(config),
+		Handler:             router.Router(),
 		ListenAddr:          addr,
 		OnStarting: func() {
 			log.Info().Msg("Service running at "+addr)

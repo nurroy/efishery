@@ -1,7 +1,6 @@
 package fetch
 
 import (
-	"belajar/efishery/configs"
 	"belajar/efishery/middleware"
 	"belajar/efishery/usecase"
 	utils "belajar/efishery/utils/response"
@@ -12,15 +11,14 @@ import (
 
 type FetchController struct {
 	fetchService usecase.FetchServiceInterface
-	config *configs.Config
 }
 
 //CreateFetchController
-func CreateFetchController(router *gin.RouterGroup, fetchService usecase.FetchServiceInterface,config *configs.Config){
-	inDB := FetchController{fetchService: fetchService,config: config}
+func CreateFetchController(router *gin.RouterGroup, fetchService usecase.FetchServiceInterface){
+	inDB := FetchController{fetchService: fetchService}
 
-	router.GET("/storages",middleware.TokenAuthMiddleware(config), inDB.GetStorages)
-	router.GET("/aggregate",middleware.TokenAuthMiddleware(config), inDB.GetAggregate)
+	router.GET("/storages",middleware.TokenAuthMiddleware(), inDB.GetStorages)
+	router.GET("/aggregate",middleware.TokenAuthMiddleware(), inDB.GetAggregate)
 }
 
 func (r *FetchController) GetStorages(c *gin.Context){
